@@ -1,32 +1,23 @@
 #include "Tile.h"
-Tile::Tile(float t_X, float t_Y)
-{
-	shape.setPosition(t_X, t_Y);
-	shape.setSize(sf::Vector2f(this->height, this->width));
-	shape.setFillColor(sf::Color::Black);
-	shape.setOrigin(100, 100);
-	shape.setOutlineColor(sf::Color::Red);
-	shape.setOutlineThickness(2);
-}
-Tile::Tile()
-{
-	shape.setSize(sf::Vector2f(this->height, this->width));
-	shape.setFillColor(sf::Color(100, 100, 100));
-	shape.setOrigin(0, -100);
-	shape.setOutlineColor(sf::Color(50, 50, 50));
-	shape.setOutlineThickness(4);
-}
 void Tile::setBaseColor()
 {
 	shape.setFillColor(sf::Color(100, 100, 100));
 }
+Tile::Tile()
+{
+	setBaseColor();
+	shape.setSize(sf::Vector2f(this->height, this->width));
+	shape.setOrigin(0, -100);
+	shape.setOutlineColor(sf::Color(50, 50, 50));
+	shape.setOutlineThickness(4);
+}
 float Tile::getHeight() 
 {
-	return this->height;
+	return height;
 }
 float Tile::getWidth()
 {
-	return this->width;
+	return width;
 }
 void Tile::ChangePosition(float x, float y) 
 {
@@ -48,41 +39,35 @@ void Tile::scanAround(Tile** arr)
 }
 void Tile::update(float x, float y, int& minesNum, sf::Event event)
 {
-	if (x > shape.getPosition().x && x < shape.getPosition().x + 50 && y < shape.getPosition().y && y > shape.getPosition().y - 50)
+	if (x > shape.getPosition().x && x < shape.getPosition().x + height && y < shape.getPosition().y && y > shape.getPosition().y - width)
 	{
-			if (event.mouseButton.button == sf::Mouse::Right&&!opened) 
+			if (event.mouseButton.button == sf::Mouse::Right && !opened && !flag)
 			{
 				setFlag();
-				if (getFlag())
-				{
-					shape.setFillColor(sf::Color::Red);
-					--minesNum;
-				}
-				if (!getFlag())
-				{
-					shape.setFillColor(sf::Color(100, 100, 100));
-					++minesNum;
-				}
+				--minesNum;
 			}
-			if (event.mouseButton.button == sf::Mouse::Left&&!flag)
-			{				
-				setOpened();				
+			else if (event.mouseButton.button == sf::Mouse::Right && flag)
+			{
+				setFlag();
+				++minesNum;
+			}
+			else if (event.mouseButton.button == sf::Mouse::Left && !flag)
+			{
+				setOpened();
 			}
 	}
 }
 void Tile::update(float x, float y, Tile **arr)
 {
-	if (x > shape.getPosition().x && x < shape.getPosition().x + 50 && y < shape.getPosition().y && y > shape.getPosition().y - 50)
-	{		
-		if (!flag&&!opened)
-		{
-			shape.setFillColor(sf::Color(100, 100, 100, 120));
-		}			
-	}
-	else if (opened)
+	if (opened)
 	{
 		shape.setFillColor(sf::Color::White);
+		flag = false;
 		scanAround(arr);
+	}
+	if (flag)
+	{
+		shape.setFillColor(sf::Color::Red);
 	}
 	/*else if (mine)
 	{
@@ -92,9 +77,13 @@ void Tile::update(float x, float y, Tile **arr)
 	{
 		shape.setFillColor(sf::Color::Green);
 	}*/
-	else if (!flag&&!opened)
+	if (!flag&&!opened)
 	{
 		setBaseColor();
+	}
+	if (x > shape.getPosition().x && x < shape.getPosition().x + height && y < shape.getPosition().y && y > shape.getPosition().y - width && !flag && !opened)
+	{
+		shape.setFillColor(sf::Color(100, 100, 100, 120));
 	}
 }
 void Tile::setMine()
