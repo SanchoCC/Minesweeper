@@ -1,26 +1,33 @@
 #include <iostream>
 #include <ctime>
+#include <string>
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
-#include <string>
+
 #include "Tile.h"
 #include "Counter.h"
 
 int main()
-{
-    Tile tile(0, 0);
-        
-    const int rows = 10;      
-    const int cols = 10;
+{   
+    Tile tile;
+    float tileHeight = tile.getHeight();
+    float tileWidth = tile.getWidth();
+    const int rows = 9;      
+    const int cols = 9;
     const int& field = rows*cols;
-    const float& windowWidth = cols*50;
-    const float& windowHeight = rows*50+100;
-    int minesNum = 20;
+    const float& windowWidth = cols*tileHeight;
+    const float& windowHeight = rows*tileWidth+100;
+    int minesNum = 10;
+    if (minesNum >= field)
+    {
+        std::cerr << "Too many mines." << std::endl;
+        return 1;
+    }
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Minesweeper");
     window.setFramerateLimit(60);
     sf::Event event;
     
-
     Tile** arr = new Tile * [rows];
     for (int i = 0; i < rows; ++i)
     {
@@ -35,9 +42,9 @@ int main()
     {
         for (int j = 0; j < cols; ++j)
         {
-            arr[i][j].ChangePosition(50 * i, 50 * j);
+            arr[i][j].ChangePosition(tileWidth * i, tileHeight * j);
             arr[i][j].fillAround(i, j, rows, cols);
-            arrCounter[i][j].ChangePosition(50 * i+3, 50 * j + 10);
+            arrCounter[i][j].ChangePosition(tileWidth * i+tileWidth/15, tileHeight * j+tileHeight/10);
             int thisCounter = arr[i][j].getMinesAround();
             arrCounter[i][j].setCounter(thisCounter);
         }
@@ -65,22 +72,22 @@ int main()
                 break;
             }
             counter.draw(window);
-            counter.update(minesNum);
             for (int i = 0; i < rows; ++i)
             {
                 for (int j = 0; j < cols; ++j)
                 {
                     window.draw(arr[i][j]);
-                    arr[i][j].update(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y - 150, arr);
                     arrCounter[i][j].draw(window);
                     int thisCounter = arr[i][j].getMinesAround();
-                    arrCounter[i][j].update(thisCounter);
-                    arrCounter[i][j].update(arr[i][j].getOpened());                                      
+                    arrCounter[i][j].update(thisCounter, arr[i][j].getOpened());;                                      
                     if (event.type == sf::Event::MouseButtonPressed)
                     {
-                        arr[i][j].update(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y - 150, minesNum, event);
+                        arr[i][j].update(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y - (100 + tileWidth), minesNum, event);
 
                     }
+                    arr[i][j].update(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y - (100+tileWidth), arr);
+
+                    counter.update(minesNum, true);
                 }
             }
             window.display();

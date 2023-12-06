@@ -1,14 +1,14 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+
 #include <ctime>
-#include <Windows.h>
 #include <vector>
+
+#include <SFML/Graphics.hpp>
+
 class Tile : public sf::Drawable
 {
 public:
 	Tile();
-	Tile(float t_X, float t_Y);
-	~Tile() = default;
 	void ChangePosition(float x, float y);
 	float getHeight();
 	float getWidth();

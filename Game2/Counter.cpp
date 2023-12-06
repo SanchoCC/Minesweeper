@@ -9,6 +9,10 @@ std::string Counter::getCounter()
         {
             return "M";
         }
+        if (this->counter <= 0)
+        {
+            return " ";
+        }
         else
         {
             return std::to_string(this->counter);
@@ -21,7 +25,6 @@ Counter::Counter(int counter, float positionX, float positionY, int CharacterSiz
     text.setFont(font);
     setCounter(counter);
     text.setString(getCounter());
-    text.setFillColor(sf::Color::Red);
     text.setCharacterSize(CharacterSize);
     text.setOrigin(0, 0);
     text.setPosition(positionX, positionY);
@@ -33,8 +36,16 @@ Counter::Counter()
 {
     font.loadFromFile("Arial.ttf");
     text.setFont(font);
-    text.setFillColor(sf::Color::Red);
-    text.setCharacterSize(40);
+    if (tile.getHeight() > tile.getWidth()) 
+    {
+        text.setCharacterSize(tile.getHeight() * 0.7);
+        text.setScale(1, tile.getWidth() / tile.getHeight());
+    }
+    else {
+        text.setCharacterSize(tile.getWidth() * 0.7);
+        text.setScale(tile.getHeight() / tile.getWidth(), 1);
+    }
+   
     text.setOrigin(0, -100);
     text.setPosition(0, 0);
     text.setOutlineThickness(2);
@@ -48,18 +59,13 @@ void Counter::ChangePosition(float x, float y)
 {
     text.setPosition(y, x);
 }
-void Counter::update(int minesNum)
+void Counter::update(int minesNum, bool opened)
 {
     setCounter(minesNum);
-    if (opened&&minesNum!=0)
-    {
-        text.setString(getCounter());
-    }
     switch (minesNum)
     {
     case 0:       
-            text.setString(' ');
-            break;
+        break;
     case 1:
         text.setFillColor(sf::Color::Cyan);
         break;
@@ -79,14 +85,11 @@ void Counter::update(int minesNum)
         text.setFillColor(sf::Color::Magenta);
         break;
     default:
+        text.setFillColor(sf::Color::Black);
         break;
-    }   
-}
-void Counter::update(bool opened)
-{
+    }  
     if (opened)
     {
         text.setString(getCounter());
     }
-    
 }
