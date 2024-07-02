@@ -1,1 +1,2 @@
-# Game2
+# Minesweeper 
+## Run in Debug x86
